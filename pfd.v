@@ -4,7 +4,7 @@ module PFDtb;
 reg d1, d2, clk;
 wire up, dn;
 
-PFD uut(
+PFD ninja(
 .d1(d1),
 .d2(d2),
 .clk(clk),
