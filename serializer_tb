@@ -1,0 +1,28 @@
+
+module tb_serializer();
+  reg clk, rst_n, load;
+  reg [7:0] parallel_data;
+  wire serial_out, ready;
+
+  serializer uut (clk, rst_n, parallel_data, load, serial_out, ready);
+
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk; 
+  end
+
+  initial begin
+    rst_n = 1;
+    #10 rst_n = 0; 
+  end
+
+  initial begin
+    parallel_data = 8'hA5; 
+    load = 0;
+    #10 load = 1; 
+    #10 load = 0;
+    #80 parallel_data =8'hE9;
+    load =1; 
+    #10 load=0;
+  end
+endmodule
