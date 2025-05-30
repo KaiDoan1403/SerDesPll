@@ -1,0 +1,42 @@
+`timescale 1ns / 1ps
+
+module SerialToParallel(
+input wire clk,
+input wire serial,
+input wire rst,
+input wire load,
+
+output reg ready,
+output reg [7:0] parallel
+    );
+    reg [7:0] shift_reg; // 8 bit register
+    reg [2:0] count; // 3 bit counter
+    reg active; // 1 = running, 0 = stopped
+    
+    always @(posedge clk or negedge rst) begin
+    if(!rst) begin // reset everything to make sure values are accutate and resetted
+        shift_reg <= 8'b0;
+        ready <= 1'b0;
+        parallel <= 8'b0;
+        count <= 3'b0;
+        active <= 1'b0;
+    end else begin
+    if(load && !active) begin // initiate with first bit and set to MSB
+        active <= 1'b1;
+        count <= 3'd7;
+        ready <= 1'b0;
+        shift_reg <= {serial, 7'b0}; // first bit will be the serial that will be stored in the 7th position
+    end else if(active) begin
+        shift_reg <= {shift_reg[6:0], serial}; // keeping the MSB from line 28, the next loaded bits will shift over by 1 from 6 to 0 position
+    
+    if(count == 0) begin // once count = 0, parallel will read
+    parallel <= {shift_reg[6:0], serial};
+    ready <= 1'b1;
+    active <= 1'b0;
+    end else begin // continue serial convertion until count is 0
+    count <= count - 1;
+    end
+    end
+    end
+    end
+endmodule
